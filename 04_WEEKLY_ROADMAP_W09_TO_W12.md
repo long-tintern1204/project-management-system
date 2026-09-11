@@ -8,32 +8,32 @@ Dựa trên bảng kế hoạch đào tạo chính thức của Mentor:
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────────┐
-│ W09: Kickoff hệ thống quản lý 実績 + Chốt Scope/Backlog                         │
-│ - Đọc kỹ tài liệu API仕様, Q&A với mentor để chốt 18 fields, enums, soft delete│
+│ W09: Kickoff hệ thống quản lý 実績 + Chốt Scope/Backlog    (Long báo cáo tuần)  │
+│ - Đọc kỹ tài liệu API仕様, Q&A với mentor để chốt 18 fields, enums, soft delete │
 │ - Tạo model 'projects' (technologies_csv, project_types_csv, deleted_at)        │
-│ - Tạo bảng 'tech_tags' + chạy migration Alembic                                │
-│ - Tích hợp Auth /auth/register + /auth/login, bảo vệ endpoint bằng JWT        │
+│ - Tạo bảng 'tech_tags' + chạy migration Alembic                                 │
+│ - Tích hợp Auth /auth/register + /auth/login, bảo vệ endpoint bằng JWT          │
 └───────────────────────────────────────┬─────────────────────────────────────────┘
                                         │
 ┌───────────────────────────────────────▼─────────────────────────────────────────┐
-│ W10: Implement Project APIs (Backend) CRUD theo đúng Spec (Long dẫn dắt tuần)  │
-│ - CRUD Project: POST /projects, GET /projects (cơ bản), GET /{id}, PUT, DELETE │
-│ - Validate 18 fields + enums project_types/dev_process_phases                  │
-│ - technologies: Tự động upsert vào tech_tags khi tạo/cập nhật                  │
-│ - DELETE: Soft delete (gán deleted_at, không xóa vật lý)                       │
+│ W10: Implement Project APIs (Backend) CRUD theo đúng Spec (Khanh báo cáo)       │
+│ - CRUD Project: POST /projects, GET /projects (cơ bản), GET /{id}, PUT, DELETE  │
+│ - Validate 18 fields + enums project_types/dev_process_phases                   │
+│ - technologies: Tự động upsert vào tech_tags khi tạo/cập nhật                   │
+│ - DELETE: Soft delete (gán deleted_at, không xóa vật lý)                        │
 └───────────────────────────────────────┬─────────────────────────────────────────┘
                                         │
 ┌───────────────────────────────────────▼─────────────────────────────────────────┐
 │ W11: Filter / Search + Pagination + Tech-tags Autocomplete (Tuyết báo cáo tuần) │
-│ - Filter multi-value (OR trong từng field, AND giữa các field khác nhau)       │
+│ - Filter multi-value (OR trong từng field, AND giữa các field khác nhau)        │
 │ - Full-text search 'q' trên customer_name, project_name, description            │
-│ - Pagination chuẩn: page, page_size, total                                     │
-│ - GET /tech-tags?q= autocomplete (case-insensitive, max 20, q rỗng trả all)    │
-│ - Chuẩn hoá total_man_month (man-month, KHÔNG PHẢI TIỀN) và team_size          │
+│ - Pagination chuẩn: page, page_size, total                                      │
+│ - GET /tech-tags?q= autocomplete (case-insensitive, max 20, q rỗng trả all)     │
+│ - Chuẩn hoá total_man_month (man-month, KHÔNG PHẢI TIỀN) và team_size           │
 └───────────────────────────────────────┬─────────────────────────────────────────┘
                                         │
 ┌───────────────────────────────────────▼─────────────────────────────────────────┐
-│ W12: Tests tối thiểu + Final Docs + Final Demo (Khanh báo cáo tuần & demo)     │
+│ W12: Tests tối thiểu + Final Docs + Final Demo (Cả 3 báo cáo tuần & demo)     │
 │ - 5–7 Pytest tests "xương sống" (Auth, CRUD, Soft delete, Filter, Tech-tags)   │
 │ - README backend hoàn chỉnh + Kịch bản Demo 6–8 bước                           │
 │ - Fix bug, nghiệm thu, retro và nộp báo cáo cá nhân                            │
