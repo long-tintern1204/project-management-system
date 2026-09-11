@@ -43,7 +43,7 @@ Dựa trên bảng kế hoạch đào tạo chính thức của Mentor:
 ---
 
 ## 🗓️ 2. Kế hoạch hằng ngày chi tiết cho TUẦN 2 (W10: Implement CRUD Project APIs)
-**Người đại diện báo cáo tuần W10:** **Long**
+**Người đại diện báo cáo tuần W10:** **Cả **
 
 | Ngày | Mục tiêu chính | Khanh (Data / Read Engine) | Tuyết (Schemas & Mutation/Tags) | Long (Security, QA & Frontend) | Tiêu chí hoàn thành (DoD) |
 | :--- | :--- | :--- | :--- | :--- | :--- |
