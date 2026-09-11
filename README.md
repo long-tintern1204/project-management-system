@@ -27,7 +27,7 @@ Dự án **プロジェクト管理システム (Project Performance Management 
 | [**`03_TEAM_WBS_AND_GIT_WORKFLOW.md`**](./03_TEAM_WBS_AND_GIT_WORKFLOW.md) | Phân chia công việc chi tiết cho 3 thành viên (Long, Khanh, Tuyết), quy tắc Git Branching, quy trình Review PR chống xung đột mã nguồn. |
 | [**`04_WEEKLY_ROADMAP_W09_TO_W12.md`**](./04_WEEKLY_ROADMAP_W09_TO_W12.md) | Lộ trình chi tiết từng tuần theo tài liệu đào tạo: W09 (Kickoff), W10 (CRUD), W11 (Filter/Search/Paging), W12 (Testing/Docs/Demo) kèm kế hoạch ngày (Day-by-Day). |
 | [**`05_TESTING_AND_FRONTEND_INTEGRATION.md`**](./05_TESTING_AND_FRONTEND_INTEGRATION.md) | Bộ kịch bản kiểm thử (Pytest xương sống), Checklist tích hợp thực tế với Frontend React và các bẫy lỗi phổ biến cần tránh. |
-| [**`06_W09_WEEKLY_PROGRESS_REPORT_JA.md`**](./06_W09_WEEKLY_PROGRESS_REPORT_JA.md) | Báo cáo tiến độ tuần W09 bằng tiếng Nhật (週次進捗報告書) kèm kịch bản thuyết trình (Speaking Script). |
+| [**`06_EXCEL_TEST_CASES_SPECIFICATION.md`**](./06_EXCEL_TEST_CASES_SPECIFICATION.md) | **Đặc tả 6 Sheet Test Case Excel chuẩn Nhật (Tuần W11)**: Phân chia đều cho 3 thành viên (Long: Auth; Khanh: List/Filter; Tuyết: Create/Detail/Soft Delete). |
 | [**`07_BACKLOG_TEAM_GUIDELINES.md`**](./07_BACKLOG_TEAM_GUIDELINES.md) | **Quy định dự án cho Backlog**: Hướng dẫn làm việc nhóm, Git Flow, phân vai (Roles), Code conventions & DoD để copy vào Backlog task/wiki. |
 
 ---
