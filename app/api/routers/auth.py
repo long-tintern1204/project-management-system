@@ -32,7 +32,7 @@ def register(user_input: UserAuthInput):
     hashed_pwd = get_password_hash(user_input.password)
     user_data = {
         "email": user_input.email,
-        "hashed_password": hashed_pwd,
+        "password_hash": hashed_pwd,
         "role": "member",
     }
     USERS_DB[user_input.email] = user_data
@@ -57,7 +57,7 @@ def login(user_input: UserAuthInput):
     user = USERS_DB.get(user_input.email)
 
     # 2. Nếu không tìm thấy hoặc sai mật khẩu -> Báo 401 Unauthorized
-    if not user or not verify_password(user_input.password, user["hashed_password"]):
+    if not user or not verify_password(user_input.password, user["password_hash"]):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="メールアドレスまたはパスワードが正しくありません",

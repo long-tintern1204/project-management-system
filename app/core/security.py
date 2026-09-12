@@ -20,9 +20,9 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 security_bearer = HTTPBearer(auto_error=False)
 
 
-def verify_password(plain_password: str, hashed_password: str) -> bool:
+def verify_password(plain_password: str, password_hash: str) -> bool:
     """So khớp mật khẩu nhập vào với mật khẩu đã băm trong DB"""
-    return pwd_context.verify(plain_password, hashed_password)
+    return pwd_context.verify(plain_password, password_hash)
 
 
 def get_password_hash(password: str) -> str:
