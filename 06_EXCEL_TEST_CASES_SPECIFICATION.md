@@ -19,17 +19,3 @@
 | | **6. `プロジェクト詳細・編集・削除-UI確認`** | Màn hình Chi tiết (`/projects/:id`), Chỉnh sửa & Xóa mềm | - Xem chi tiết đầy đủ 18 fields, các chip Badge màu sắc.<br>- Nút `編集` $\rightarrow$ chuyển sang `/projects/:id/edit`, pre-fill dữ liệu cũ vào form.<br>- Cập nhật dự án thành công, đồng bộ lại tag.<br>- Nút `削除` $\rightarrow$ mở Modal popup xác nhận xóa mềm.<br>- Xóa mềm thành công: Dự án biến mất khỏi danh sách, link chi tiết báo 404.<br>- Giữ nguyên các tag trong `tech_tags` sau khi xóa dự án (theo Q4 Mentor). |
 
 ---
-
-## 📝 2. HƯỚNG DẪN CÁC THÀNH VIÊN TỰ ĐIỀN VÀO FILE EXCEL
-
-1. **Mở file Excel mẫu của Mentor:** Tạo các sheet mới theo đúng tên bảng ở trên (Sheet 1 đến Sheet 6).
-2. **Điền thông tin Header:** Điền tên người làm vào mục **作成者** và tên người review chéo vào mục **確認者**.
-3. **Viết các dòng test case (ID 001, 002, ...):**
-   * **前提条件 (Tiền đề):** Đã đăng nhập hay chưa? DB có dữ liệu hay rỗng?
-   * **条件 (Điều kiện/Thao tác):** Thành phần GUI cần kiểm tra và thao tác click/nhập.
-   * **確認内容 (Kỳ vọng):** Kết quả mong đợi hiển thị đúng chức năng và không bị vỡ giao diện.
-   * **Phân loại:** Điền `G` (GUI) hoặc `B` (Nghiệp vụ), `N` (Bình thường) hoặc `A` (Bất thường).
-4. **Chạy test thực tế trên giao diện React & Đánh dấu kết quả:**
-   * Mở giao diện `http://localhost:5173` kết nối Backend FastAPI.
-   * Chạy từng dòng test case: Đạt điền **`○`**, lỗi điền **`×`** (báo người phụ trách sửa ngay).
-   * Mục tiêu nghiệm thu tuần W11: **100% các dòng test case đạt `○` (Pass)**.
