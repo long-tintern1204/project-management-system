@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 # Import router auth đã viết
-from app.api.routers import auth
+from app.api.routers import auth, projects
 
 load_dotenv()
 # 1. Khởi tạo ứng dụng FastAPI với tiêu đề dự án chuẩn
@@ -26,6 +26,7 @@ app.add_middleware(
 )
 # 3. Đăng ký các router vào app
 app.include_router(auth.router)
+app.include_router(projects.router)
 
 # 4. Endpoint kiểm tra sức khỏe hệ thống
 
