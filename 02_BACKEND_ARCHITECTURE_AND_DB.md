@@ -112,7 +112,6 @@ backend/
 │   │   ├── auth.py                 # POST /auth/register, POST /auth/login
 │   │   ├── projects.py             # CRUD /projects (POST, GET, PUT, DELETE)
 │   │   ├── tech_tags.py            # GET /tech-tags?q=
-│   │   └── health.py               # GET /health (Readiness probe)
 │   │
 │   └── main.py                     # Khởi tạo FastAPI App, cấu hình CORS, mount routers
 │
