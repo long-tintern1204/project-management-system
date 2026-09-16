@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -7,15 +7,18 @@ from app.core.security import get_current_user
 from app.models.project import Project
 from app.schemas.project import (
     ProjectCreateInput,
+    ProjectListResponse,
     ProjectResponse,
     ProjectUpdateInput,
 )
+from app.services import project_query_service
 from app.services.project_service import upsert_tech_tags
 
 
 router = APIRouter(
     prefix="/projects",
-    tags=["projects"],
+    tags=["Projects"],
+    dependencies=[Depends(get_current_user)],
 )
 
 
@@ -65,7 +68,7 @@ def update_project_fields(
     project.project_name = project_input.project_name
     project.description = project_input.description
 
-    # Model hiện tại lưu ngày dưới dạng String
+    # Model hiện tại lưu ngày dưới dạng chuỗi ISO (YYYY-MM-DD).
     project.start_date = project_input.start_date.isoformat()
     project.end_date = (
         project_input.end_date.isoformat()
@@ -88,11 +91,42 @@ def update_project_fields(
         [item.value for item in project_input.project_types]
     )
     project.dev_process_phases_csv = list_to_csv(
-        [
-            item.value
-            for item in project_input.dev_process_phases
-        ]
+        [item.value for item in project_input.dev_process_phases]
     )
+
+
+@router.get(
+    "",
+    response_model=ProjectListResponse,
+    summary="プロジェクト一覧取得",
+)
+def list_projects(
+    page: int = Query(1, ge=1, description="ページ番号"),
+    page_size: int = Query(
+        20,
+        ge=1,
+        le=1000,
+        description="1ページあたりの件数",
+    ),
+    db: Session = Depends(get_db),
+):
+    return project_query_service.get_projects(
+        db,
+        page=page,
+        page_size=page_size,
+    )
+
+
+@router.get(
+    "/{project_id}",
+    response_model=ProjectResponse,
+    summary="プロジェクト詳細取得",
+)
+def get_project(
+    project_id: int,
+    db: Session = Depends(get_db),
+):
+    return project_query_service.get_project_by_id(db, project_id)
 
 
 @router.post(
@@ -138,7 +172,6 @@ def update_project(
     project_id: int,
     project_input: ProjectUpdateInput,
     db: Session = Depends(get_db),
-    current_user: dict = Depends(get_current_user),
 ) -> ProjectResponse:
     project = db.scalar(
         select(Project).where(
