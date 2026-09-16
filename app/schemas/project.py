@@ -48,7 +48,7 @@ class ProjectCreateInput(BaseModel):
         cleaned_value = value.strip()
 
         if not cleaned_value:
-            raise ValueError("must not be blank")
+            raise ValueError("空白のみの値は入力できません")
 
         return cleaned_value
 
@@ -56,7 +56,7 @@ class ProjectCreateInput(BaseModel):
     def validate_project_dates(self) -> "ProjectCreateInput":
         if self.is_ongoing and self.end_date is not None:
             raise ValueError(
-                "end_date must not be provided when is_ongoing is true"
+                "進行中のプロジェクトには終了日を設定できません"
             )
 
         if (
@@ -64,7 +64,7 @@ class ProjectCreateInput(BaseModel):
             and self.end_date < self.start_date
         ):
             raise ValueError(
-                "end_date must be on or after start_date"
+                "終了日は開始日以降の日付を指定してください"
             )
 
         return self
