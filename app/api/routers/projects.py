@@ -16,7 +16,7 @@ router = APIRouter(
 @router.get("", response_model=ProjectListResponse, summary="プロジェクト一覧取得")
 def list_projects(
     page: int = Query(1, ge=1, description="ページ番号"),
-    page_size: int = Query(20, ge=1, le=100, description="1ページあたりの件数"),
+    page_size: int = Query(20, ge=1, le=1000, description="1ページあたりの件数"),
     db: Session = Depends(get_db),
 ):
     return project_query_service.get_projects(db, page=page, page_size=page_size)

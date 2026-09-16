@@ -49,7 +49,7 @@ def test_list_hides_soft_deleted(client, db, auth_headers, soft_deleted_project)
 
 def test_list_rejects_invalid_page(client, auth_headers):
     assert client.get("/projects?page=0", headers=auth_headers).status_code == 422
-    assert client.get("/projects?page_size=101", headers=auth_headers).status_code == 422
+    assert client.get("/projects?page_size=1001", headers=auth_headers).status_code == 422
 
 
 # --- GET /projects/{id} ---
@@ -86,3 +86,16 @@ def test_detail_not_found(client, auth_headers):
 
 def test_detail_soft_deleted_is_404(client, auth_headers, soft_deleted_project):
     assert client.get(f"/projects/{soft_deleted_project.id}", headers=auth_headers).status_code == 404
+
+
+def test_detail_blank_end_date_becomes_null(client, db, auth_headers):
+    project = make_project(db, end_date="")
+
+    body = client.get(f"/projects/{project.id}", headers=auth_headers).json()
+    assert body["end_date"] is None
+
+
+def test_list_accepts_page_size_1000(client, auth_headers):
+    res = client.get("/projects?page_size=1000", headers=auth_headers)
+    assert res.status_code == 200
+    assert res.json()["page_size"] == 1000

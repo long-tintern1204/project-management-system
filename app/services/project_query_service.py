@@ -20,7 +20,7 @@ def to_response(project: Project) -> ProjectResponse:
         project_name=project.project_name,
         description=project.description,
         start_date=project.start_date,
-        end_date=project.end_date,
+        end_date=project.end_date or None,
         is_ongoing=project.is_ongoing,
         team_size=project.team_size,
         total_man_month=project.total_man_month,
