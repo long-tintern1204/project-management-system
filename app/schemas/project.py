@@ -1,7 +1,13 @@
 from datetime import date, datetime
 from enum import Enum
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    field_validator,
+    model_validator,
+)
 
 
 class ProjectType(str, Enum):
@@ -21,7 +27,7 @@ class DevProcessPhase(str, Enum):
     MAINTENANCE_OPS = "maintenance_ops"
 
 
-class ProjectCreateInput(BaseModel):
+class ProjectWriteInput(BaseModel):
     customer_name: str = Field(min_length=1, max_length=255)
     project_name: str = Field(min_length=1, max_length=255)
 
@@ -40,7 +46,9 @@ class ProjectCreateInput(BaseModel):
 
     technologies: list[str] = Field(default_factory=list)
     project_types: list[ProjectType] = Field(default_factory=list)
-    dev_process_phases: list[DevProcessPhase] = Field(default_factory=list)
+    dev_process_phases: list[DevProcessPhase] = Field(
+        default_factory=list
+    )
 
     @field_validator("customer_name", "project_name")
     @classmethod
@@ -48,12 +56,14 @@ class ProjectCreateInput(BaseModel):
         cleaned_value = value.strip()
 
         if not cleaned_value:
-            raise ValueError("空白のみの値は入力できません")
+            raise ValueError(
+                "空白のみの値は入力できません"
+            )
 
         return cleaned_value
 
     @model_validator(mode="after")
-    def validate_project_dates(self) -> "ProjectCreateInput":
+    def validate_project_dates(self) -> "ProjectWriteInput":
         if self.is_ongoing and self.end_date is not None:
             raise ValueError(
                 "進行中のプロジェクトには終了日を設定できません"
@@ -68,6 +78,14 @@ class ProjectCreateInput(BaseModel):
             )
 
         return self
+
+
+class ProjectCreateInput(ProjectWriteInput):
+    pass
+
+
+class ProjectUpdateInput(ProjectWriteInput):
+    pass
 
 
 class ProjectResponse(BaseModel):
@@ -89,7 +107,9 @@ class ProjectResponse(BaseModel):
 
     technologies: list[str] = Field(default_factory=list)
     project_types: list[ProjectType] = Field(default_factory=list)
-    dev_process_phases: list[DevProcessPhase] = Field(default_factory=list)
+    dev_process_phases: list[DevProcessPhase] = Field(
+        default_factory=list
+    )
 
     created_by: str
     created_at: datetime
