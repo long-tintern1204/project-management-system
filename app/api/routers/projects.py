@@ -91,3 +91,9 @@ def update_project(
         )
 
     return project
+
+
+@router.delete("/{project_id}", status_code=status.HTTP_204_NO_CONTENT, summary="プロジェクト削除")
+def delete_project(project_id: int, db: Session = Depends(get_db)):
+    project_service.delete_project(db, project_id)
+    return None
