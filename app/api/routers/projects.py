@@ -1,10 +1,10 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.core.security import get_current_user
 from app.schemas import ProjectListResponse, ProjectResponse
-from app.services import project_query_service
+from app.services import project_query_service, project_service
 
 router = APIRouter(
     prefix="/projects",
@@ -25,3 +25,8 @@ def list_projects(
 @router.get("/{project_id}", response_model=ProjectResponse, summary="プロジェクト詳細取得")
 def get_project(project_id: int, db: Session = Depends(get_db)):
     return project_query_service.get_project_by_id(db, project_id)
+
+@router.delete("/{project_id}", status_code=status.HTTP_204_NO_CONTENT, summary="プロジェクト削除")
+def delete_project(project_id: int, db: Session = Depends(get_db)):
+    project_service.delete_project(db, project_id)
+    return None
