@@ -31,12 +31,32 @@ def list_projects(
         le=1000,
         description="1ページあたりの件数",
     ),
+    q: str | None = Query(
+        None,
+        description="全文検索（customer_name / project_name / description の部分一致）",
+    ),
+    technology: list[str] | None = Query(
+        None,
+        description="技術で絞り込み（同一項目内は OR）",
+    ),
+    project_type: list[str] | None = Query(
+        None,
+        description="種別で絞り込み（同一項目内は OR）",
+    ),
+    dev_process_phase: list[str] | None = Query(
+        None,
+        description="開発工程で絞り込み（同一項目内は OR）",
+    ),
     db: Session = Depends(get_db),
 ):
     return project_query_service.get_projects(
         db,
         page=page,
         page_size=page_size,
+        q=q,
+        technologies=technology,
+        project_types=project_type,
+        dev_process_phases=dev_process_phase,
     )
 
 
