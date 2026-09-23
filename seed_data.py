@@ -363,10 +363,10 @@ def seed():
     try:
         print("🌱 Seeding data...")
 
-        # 1. Tạo user demo/admin mẫu nếu chưa có
+        # 1. Tạo user demo mẫu nếu chưa có (chuẩn role member)
         default_users = [
-            {"email": "admin@gmail.com", "password": "AdminPass123@", "role": "admin"},
-            {"email": "admin@example.com", "password": "Password123", "role": "admin"},
+            {"email": "admin@gmail.com", "password": "AdminPass123@", "role": "member"},
+            {"email": "admin@example.com", "password": "Password123", "role": "member"},
         ]
         for u in default_users:
             user = db.scalar(select(User).where(User.email == u["email"]))
@@ -378,12 +378,13 @@ def seed():
                 )
                 db.add(user)
                 db.commit()
-                print(f"  ✓ Created user: {u['email']} (Password: {u['password']})")
+                print(f"  ✓ Created user: {u['email']} (Password: {u['password']}, Role: member)")
             else:
-                # Cập nhật lại mật khẩu chuẩn nếu đã tồn tại
+                # Cập nhật lại mật khẩu và role chuẩn member
                 user.password_hash = get_password_hash(u["password"])
+                user.role = u["role"]
                 db.commit()
-                print(f"  ✓ Updated user password: {u['email']}")
+                print(f"  ✓ Updated user password & role: {u['email']}")
 
         admin_email = "admin@gmail.com"
 
