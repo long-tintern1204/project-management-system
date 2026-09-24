@@ -36,8 +36,16 @@ class ProjectWriteInput(BaseModel):
     end_date: date | None = None
     is_ongoing: bool = False
 
-    team_size: int | None = Field(default=None, ge=1)
-    total_man_month: float | None = Field(default=None, ge=0)
+    team_size: int | None = Field(
+    default=None,
+    ge=1,
+)
+
+    total_man_month: float | None = Field(
+    default=None,
+    ge=0,
+    allow_inf_nan=False,
+)
 
     source_note: str | None = None
     industry: str | None = Field(default=None, max_length=255)
