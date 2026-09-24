@@ -363,20 +363,30 @@ def seed():
     try:
         print("🌱 Seeding data...")
 
-        # 1. Tạo user demo/admin nếu chưa có
-        admin_email = "admin@example.com"
-        admin = db.scalar(select(User).where(User.email == admin_email))
-        if not admin:
-            admin = User(
-                email=admin_email,
-                password_hash=get_password_hash("Password123"),
-                role="admin",
-            )
-            db.add(admin)
-            db.commit()
-            print(f"  ✓ Created user: {admin_email} (Password: Password123)")
-        else:
-            print(f"  - User {admin_email} already exists")
+        # 1. Tạo user demo mẫu nếu chưa có (chuẩn role member)
+        default_users = [
+            {"email": "admin@gmail.com", "password": "AdminPass123@", "role": "member"},
+            {"email": "admin@example.com", "password": "Password123", "role": "member"},
+        ]
+        for u in default_users:
+            user = db.scalar(select(User).where(User.email == u["email"]))
+            if not user:
+                user = User(
+                    email=u["email"],
+                    password_hash=get_password_hash(u["password"]),
+                    role=u["role"],
+                )
+                db.add(user)
+                db.commit()
+                print(f"  ✓ Created user: {u['email']} (Password: {u['password']}, Role: member)")
+            else:
+                # Cập nhật lại mật khẩu và role chuẩn member
+                user.password_hash = get_password_hash(u["password"])
+                user.role = u["role"]
+                db.commit()
+                print(f"  ✓ Updated user password & role: {u['email']}")
+
+        admin_email = "admin@gmail.com"
 
         # 2. Xử lý TechTag và nạp Projects
         all_tags = set()
