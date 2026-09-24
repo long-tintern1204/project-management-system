@@ -2,15 +2,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.models.tech_tag import TechTag
-
-
-def escape_like(value: str) -> str:
-    """Escape ký tự đặc biệt của SQL LIKE: %, _ và \."""
-    return (
-        value.replace("\\", "\\\\")
-        .replace("%", "\\%")
-        .replace("_", "\\_")
-    )
+from app.utils.sql import LIKE_ESCAPE, escape_like
 
 
 def autocomplete_tech_tags(
@@ -27,7 +19,7 @@ def autocomplete_tech_tags(
         statement = statement.where(
             TechTag.name.ilike(
                 f"%{escaped_keyword}%",
-                escape="\\",
+                escape=LIKE_ESCAPE,
             )
         )
 
