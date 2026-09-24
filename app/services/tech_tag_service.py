@@ -1,7 +1,16 @@
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.models.tech_tag import TechTag
+
+
+def escape_like(value: str) -> str:
+    """Escape ký tự đặc biệt của SQL LIKE: %, _ và \."""
+    return (
+        value.replace("\\", "\\\\")
+        .replace("%", "\\%")
+        .replace("_", "\\_")
+    )
 
 
 def autocomplete_tech_tags(
@@ -13,13 +22,18 @@ def autocomplete_tech_tags(
     statement = select(TechTag.name)
 
     if keyword:
+        escaped_keyword = escape_like(keyword)
+
         statement = statement.where(
-            TechTag.name.ilike(f"%{keyword}%")
+            TechTag.name.ilike(
+                f"%{escaped_keyword}%",
+                escape="\\",
+            )
         )
 
     statement = statement.order_by(
-        TechTag.created_at.desc(),
-        TechTag.id.desc(),
+        func.lower(TechTag.name).asc(),
+        TechTag.name.asc(),
     ).limit(20)
 
     return list(db.scalars(statement).all())
