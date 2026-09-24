@@ -1,8 +1,6 @@
 import pytest
-from fastapi.testclient import TestClient
 from jose import jwt
 
-from app.main import app
 from app.core.security import (
     get_password_hash,
     verify_password,
@@ -10,12 +8,10 @@ from app.core.security import (
     JWT_SECRET_KEY,
     JWT_ALGORITHM,
 )
-# Khởi tạo client kiểm thử của FastAPI
-client = TestClient(app)
 
 
 # 1. Kiểm tra Endpoint Health Check cho Frontend
-def test_health_check():
+def test_health_check(client):
     response = client.get("/health")
     assert response.status_code == 200
     assert response.json() == {"status": "ok", "db": "ok"}
@@ -43,7 +39,7 @@ def test_create_access_token():
     assert "exp" in decoded  # Bắt buộc phải có hạn dùng exp theo chuẩn bảo mật
     
 # 3. Kiểm tra Đăng ký tài khoản (Thành công & Validate lỗi 422)
-def test_register_flow():
+def test_register_flow(client):
     # Pass quá ngắn (< 8 ký tự) -> Báo lỗi validate 422
     invalid_payload = {
         "email": "short@example.com",
@@ -66,7 +62,7 @@ def test_register_flow():
 
 
 # 4. Kiểm tra trùng Email -> Báo 409 Conflict (Test 1 trong Doc 05)
-def test_register_duplicate_conflict():
+def test_register_duplicate_conflict(client):
     payload = {
         "email": "duplicate@example.com",
         "password": "Password123@",
@@ -82,7 +78,7 @@ def test_register_duplicate_conflict():
 
 
 # 5. Kiểm tra Đăng nhập (Sai mật khẩu 401 & Đúng 200)
-def test_login_scenarios():
+def test_login_scenarios(client):
     email = "user_test_login@example.com"
     password = "CorrectPassword123@"
 
@@ -101,7 +97,7 @@ def test_login_scenarios():
 
 
 # 6. Kiểm tra Endpoint bảo vệ GET /auth/me (Test 2 trong Doc 05)
-def test_protected_route_unauthorized():
+def test_protected_route_unauthorized(client):
     # 1. Không gửi token -> Bị chặn 401
     res_no_token = client.get("/auth/me")
     assert res_no_token.status_code == 401
@@ -125,3 +121,85 @@ def test_protected_route_unauthorized():
     assert res_valid.status_code == 200
     assert res_valid.json()["email"] == email
     assert res_valid.json()["role"] == "member"
+
+# --- Bổ sung: luật mật khẩu theo spec ---
+
+
+def test_register_requires_uppercase(client):
+    res = client.post("/auth/register", json={"email": "nocap@example.com", "password": "password123"})
+    assert res.status_code == 422
+
+
+def test_register_requires_lowercase(client):
+    res = client.post("/auth/register", json={"email": "nolower@example.com", "password": "PASSWORD123"})
+    assert res.status_code == 422
+
+
+def test_register_requires_digit(client):
+    res = client.post("/auth/register", json={"email": "nodigit@example.com", "password": "PasswordOnly"})
+    assert res.status_code == 422
+
+
+def test_login_with_weak_password_is_401_not_422(client):
+    """Đăng nhập sai phải trả 401, không được để validator mật khẩu biến thành 422"""
+    client.post("/auth/register", json={"email": "weaklogin@example.com", "password": "Password123"})
+    res = client.post("/auth/login", json={"email": "weaklogin@example.com", "password": "alllowercase"})
+    assert res.status_code == 401
+
+
+# --- Bổ sung: response chứa object user theo sheet API詳細 ---
+
+
+def test_register_response_contains_user(client):
+    res = client.post("/auth/register", json={"email": "shape@example.com", "password": "Password123"})
+    body = res.json()
+    assert body["user"] == {"email": "shape@example.com", "role": "member"}
+
+
+def test_login_response_contains_user(client):
+    client.post("/auth/register", json={"email": "shape2@example.com", "password": "Password123"})
+    body = client.post("/auth/login", json={"email": "shape2@example.com", "password": "Password123"}).json()
+    assert body["user"] == {"email": "shape2@example.com", "role": "member"}
+
+
+def test_role_is_always_member(client):
+    """Client gửi role khác cũng bị bỏ qua"""
+    res = client.post(
+        "/auth/register",
+        json={"email": "fakerole@example.com", "password": "Password123", "role": "admin"},
+    )
+    assert res.json()["user"]["role"] == "member"
+
+
+# --- Bổ sung: user thực sự được lưu vào bảng users ---
+
+
+def test_user_is_persisted_in_database(client, db):
+    from app.models import User
+
+    client.post("/auth/register", json={"email": "persist@example.com", "password": "Password123"})
+
+    user = db.query(User).filter(User.email == "persist@example.com").one()
+    assert user.role == "member"
+    assert user.password_hash != "Password123"
+
+
+def test_login_works_with_user_created_directly_in_db(client, db):
+    """Token không còn phụ thuộc bộ nhớ tiến trình: user nằm trong DB là đăng nhập được"""
+    from app.core.security import get_password_hash
+    from app.models import User
+
+    db.add(User(email="fromdb@example.com", password_hash=get_password_hash("Password123"), role="member"))
+    db.commit()
+
+    res = client.post("/auth/login", json={"email": "fromdb@example.com", "password": "Password123"})
+    assert res.status_code == 200
+    assert res.json()["user"]["email"] == "fromdb@example.com"
+
+
+# --- Bổ sung: health check chạm DB thật ---
+
+
+def test_health_check_reports_db_ok(client):
+    body = client.get("/health").json()
+    assert body == {"status": "ok", "db": "ok"}
