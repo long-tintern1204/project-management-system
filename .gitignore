@@ -29,3 +29,8 @@ Thumbs.db
 docs/
 InternTraining-Project-Tracking/
 *.log
+
+# Frontend
+node_modules/
+dist/
+.vite/
