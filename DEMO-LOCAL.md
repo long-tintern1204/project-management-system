@@ -1,27 +1,28 @@
 # Chạy demo trên máy local
 
-Hướng dẫn dựng lại **đúng môi trường demo** trên nhánh `feature/khanh-w12-auth-db-and-seed-data`:
-backend cổng 8000, frontend cổng 5173, 51 dự án mẫu phủ đủ mọi bộ lọc.
-
-Frontend nằm ở repo riêng: https://github.com/namlp721/InternTraining-Project-Tracking
-
-Cây thư mục sau khi làm xong:
+Nhánh `demo/fullstack-local` chứa **cả backend và frontend** trong một repo,
+đã chỉnh sửa để chạy được ngay. Không cần clone repo nào khác.
 
 ```
-<thư mục làm việc>/
-├── project/      backend  (repo này)             → http://localhost:8000
-└── frontend/     frontend (repo của anh Nam)     → http://localhost:5173
+project/              backend (FastAPI)  → http://localhost:8000
+└── frontend/         frontend (React)   → http://localhost:5173
 ```
 
 ---
 
-## 1. Backend
+## 1. Lấy code
 
 ```powershell
 git clone git@github.com:long-tintern1204/project-management-system.git project
 cd project
-git checkout feature/khanh-w12-auth-db-and-seed-data
+git checkout demo/fullstack-local
+```
 
+---
+
+## 2. Backend
+
+```powershell
 python -m venv .venv
 .venv\Scripts\activate
 pip install -r requirements.txt
@@ -51,47 +52,30 @@ Chạy:
 uvicorn app.main:app --reload --port 8000
 ```
 
-Kiểm tra: http://localhost:8000/health phải trả `{"status":"ok","db":"ok"}`
+Kiểm tra http://localhost:8000/health phải trả `{"status":"ok","db":"ok"}`
 
 ---
 
-## 2. Frontend
+## 3. Frontend
+
+Mở **terminal thứ hai**:
 
 ```powershell
-cd ..
-git clone https://github.com/namlp721/InternTraining-Project-Tracking.git frontend
-cd frontend
+cd project\frontend
+copy .env.example .env
 npm install
-```
-
-Tạo file `.env` trong thư mục `frontend`:
-
-```
-VITE_API_BASE_URL=http://localhost:8000
-```
-
-### Bắt buộc: áp patch tech-tags
-
-Backend đã đổi `GET /tech-tags` sang `{ items: [...] }` theo sheet `API詳細` (PR #16),
-nhưng frontend vẫn đọc mảng trần nên **dropdown lọc công nghệ sẽ trống**.
-
-```powershell
-git apply ../project/frontend-tech-tags.patch
-```
-
-Nếu anh Nam đã sửa ở repo frontend thì bỏ qua bước này (lệnh trên sẽ báo lỗi đã áp rồi).
-
-Chạy:
-
-```powershell
 npm run dev
 ```
 
 Mở http://localhost:5173
 
+> Frontend trên nhánh này đã sửa `listTechTags()` để nhận `{ items: [...] }` — backend đổi
+> định dạng response ở PR #16 theo sheet `API詳細`. Bản gốc ở repo của anh Nam chưa có sửa này
+> nên dropdown lọc công nghệ sẽ trống.
+
 ---
 
-## 3. Tài khoản demo
+## 4. Tài khoản demo
 
 | Email | Mật khẩu |
 |---|---|
@@ -102,7 +86,7 @@ Hoặc đăng ký mới. Mật khẩu phải ≥ 8 ký tự và có ít nhất 1
 
 ---
 
-## 4. Dữ liệu mẫu có gì
+## 5. Dữ liệu mẫu có gì
 
 51 dự án, **mọi trường đều được điền** (riêng `end_date` để trống ở 22 dự án đang chạy
 vì quy tắc `is_ongoing = true` thì `end_date` phải rỗng).
@@ -133,7 +117,7 @@ vì quy tắc `is_ongoing = true` thì `end_date` phải rỗng).
 
 ---
 
-## 5. Kịch bản demo gợi ý
+## 6. Kịch bản demo gợi ý
 
 1. Mở http://localhost:5173 → đăng nhập `admin@example.com` / `Password123`
 2. Danh sách hiện 51 dự án, phân trang 20/trang
@@ -147,19 +131,25 @@ vì quy tắc `is_ongoing = true` thì `end_date` phải rỗng).
 
 ---
 
-## 6. Chạy test
+## 7. Chạy test
 
 ```powershell
-cd project
 .venv\Scripts\activate
 pytest -q
 ```
 
 Kết quả: **82 passed**
 
+Kiểm tra kiểu của frontend:
+
+```powershell
+cd frontend
+npx tsc -b --noEmit
+```
+
 ---
 
-## 7. Làm lại dữ liệu từ đầu
+## 8. Làm lại dữ liệu từ đầu
 
 ```powershell
 del app.db
@@ -172,13 +162,12 @@ nên chạy lại nhiều lần không tạo bản ghi trùng.
 
 ---
 
-## 8. Khi gặp sự cố
+## 9. Khi gặp sự cố
 
 | Triệu chứng | Nguyên nhân | Cách xử lý |
 |---|---|---|
 | Frontend kẹt ở màn hình chờ | Backend chưa chạy | Mở `http://localhost:8000/health`, phải thấy `db: ok` |
 | Đăng nhập báo lỗi mạng | CORS | Frontend phải chạy đúng cổng 5173 — `app/main.py` chỉ mở cho cổng này |
-| Dropdown lọc công nghệ trống | Chưa áp patch mục 2 | `git apply ../project/frontend-tech-tags.patch` |
 | `no such table: users` | Chưa chạy migration | `alembic upgrade head` |
 | Danh sách trống | Chưa seed | `python seed_data.py` |
 | Cổng bị chiếm | Tiến trình cũ còn sống | `taskkill /F /IM uvicorn.exe` hoặc `taskkill /F /IM node.exe` |
@@ -187,7 +176,20 @@ nên chạy lại nhiều lần không tạo bản ghi trùng.
 
 ---
 
-## 9. Lưu ý về phạm vi tìm kiếm
+## 10. Lưu ý về phạm vi tìm kiếm
 
 `q` chỉ tìm trên **3 cột**: `customer_name`, `project_name`, `description` — đúng theo sheet `API詳細`.
 Nên tìm một từ chỉ xuất hiện trong `outcome_note` (ví dụ `削減`) sẽ ra 0 kết quả. Đây là hành vi cố ý.
+
+---
+
+## 11. Quan hệ giữa các nhánh
+
+| Nhánh | Nội dung | Dùng để |
+|---|---|---|
+| `develop` | Code chung của nhóm | Nhánh tích hợp |
+| `fix/backend-demo-ready` | Backend đã sửa đầy đủ | Mở PR vào `develop` |
+| `demo/fullstack-local` | `fix/backend-demo-ready` + thư mục `frontend/` | Clone về chạy demo ngay |
+
+Nhánh `demo/fullstack-local` **không nên merge vào `develop`** vì nó chứa bản sao của
+frontend. Phần backend đã nằm trong `fix/backend-demo-ready` để merge riêng.
