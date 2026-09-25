@@ -41,7 +41,7 @@ uvicorn app.main:app --reload --port 8000
 新しいターミナルウィンドウを開き、以下を実行:
 
 ```bash
-cd InternTraining-Project-Tracking
+cd frontend
 
 # node_modules のインストール (未インストールの場合):
 npm install
