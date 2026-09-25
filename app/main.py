@@ -1,6 +1,10 @@
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
+from sqlalchemy import text
+from sqlalchemy.orm import Session
+
+from app.core.database import get_db
 # Import router auth đã viết
 from app.api.routers import auth, projects, tech_tags
 
@@ -32,10 +36,17 @@ app.include_router(tech_tags.router)
 # 4. Endpoint kiểm tra sức khỏe hệ thống
 
 @app.get("/health", tags=["Health Check"])
-def health_check():
+def health_check(db: Session = Depends(get_db)):
+    """Frontend chờ db == "ok" mới cho vào app, nên phải thử DB thật."""
+    try:
+        db.execute(text("SELECT 1"))
+        db_status = "ok"
+    except Exception:
+        db_status = "ng"
+
     return {
-        "status": "ok",
-        "db": "ok",
+        "status": "ok" if db_status == "ok" else "degraded",
+        "db": db_status,
     }
     
 # 5. Endpoint gốc (Health check)

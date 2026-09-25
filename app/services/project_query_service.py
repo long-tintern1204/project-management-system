@@ -4,8 +4,7 @@ from sqlalchemy.orm import Session
 
 from app.models import Project
 from app.schemas import ProjectListResponse, ProjectResponse
-
-_LIKE_ESCAPE = "\\"
+from app.utils.sql import LIKE_ESCAPE, escape_like
 
 
 def csv_to_list(value: str | None) -> list[str]:
@@ -15,22 +14,13 @@ def csv_to_list(value: str | None) -> list[str]:
     return [item.strip() for item in value.split(",") if item.strip()]
 
 
-def _escape_like(value: str) -> str:
-    """Escape ký tự đại diện của LIKE (% _) để coi chúng là ký tự tìm kiếm bình thường"""
-    return (
-        value.replace(_LIKE_ESCAPE, _LIKE_ESCAPE * 2)
-        .replace("%", _LIKE_ESCAPE + "%")
-        .replace("_", _LIKE_ESCAPE + "_")
-    )
-
-
 def _keyword_condition(keyword: str) -> ColumnElement[bool]:
     """Tìm một phần trên customer_name / project_name / description, không phân biệt hoa thường"""
-    pattern = f"%{_escape_like(keyword.strip().lower())}%"
+    pattern = f"%{escape_like(keyword.strip().lower())}%"
     return or_(
-        func.lower(Project.customer_name).like(pattern, escape=_LIKE_ESCAPE),
-        func.lower(Project.project_name).like(pattern, escape=_LIKE_ESCAPE),
-        func.lower(func.coalesce(Project.description, "")).like(pattern, escape=_LIKE_ESCAPE),
+        func.lower(Project.customer_name).like(pattern, escape=LIKE_ESCAPE),
+        func.lower(Project.project_name).like(pattern, escape=LIKE_ESCAPE),
+        func.lower(func.coalesce(Project.description, "")).like(pattern, escape=LIKE_ESCAPE),
     )
 
 
@@ -39,8 +29,8 @@ def _csv_contains(column, value: str) -> ColumnElement[bool]:
 
     Bọc dấu phẩy hai đầu nên lọc "Java" không khớp nhầm "JavaScript".
     """
-    pattern = f"%,{_escape_like(value.strip().lower())},%"
-    return (literal(",") + func.lower(column) + literal(",")).like(pattern, escape=_LIKE_ESCAPE)
+    pattern = f"%,{escape_like(value.strip().lower())},%"
+    return (literal(",") + func.lower(column) + literal(",")).like(pattern, escape=LIKE_ESCAPE)
 
 
 def _csv_filter(column, values: list[str] | None) -> ColumnElement[bool] | None:
