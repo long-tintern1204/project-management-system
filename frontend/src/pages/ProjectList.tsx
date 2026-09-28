@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router";
 import Badge from "../components/Badge";
 import FilterDropdown from "../components/FilterDropdown";
@@ -65,7 +65,7 @@ export function ProjectList() {
   // Debounce the search input by 300ms before triggering a new query.
   // Skip the page-reset on the first run (mount) so the page restored from
   // the URL (back from Detail) is not immediately reset to 1.
-  const isFirstQEffectRef = { current: true } as { current: boolean };
+  const isFirstQEffectRef = useRef(true);
   useEffect(() => {
     if (isFirstQEffectRef.current) {
       isFirstQEffectRef.current = false;
