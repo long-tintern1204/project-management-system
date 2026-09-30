@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router";
 import Badge from "../components/Badge";
 import FilterDropdown from "../components/FilterDropdown";
@@ -63,21 +63,17 @@ export function ProjectList() {
   }
 
   // Debounce the search input by 300ms before triggering a new query.
-  // Skip the page-reset on the first run (mount) so the page restored from
-  // the URL (back from Detail) is not immediately reset to 1.
-  const isFirstQEffectRef = useRef(true);
+  // So sánh q với debouncedQ thay vì đếm số lần chạy: lúc mount hai giá trị
+  // bằng nhau (cùng đọc từ URL) nên không reset trang, còn khi người dùng gõ
+  // thì chúng khác nhau. Cách này không phụ thuộc StrictMode chạy effect 2 lần.
   useEffect(() => {
-    if (isFirstQEffectRef.current) {
-      isFirstQEffectRef.current = false;
-      setDebouncedQ(q);
-      return;
-    }
+    if (q === debouncedQ) return;
     const timer = setTimeout(() => {
       setDebouncedQ(q);
       setPage(1);
     }, SEARCH_DEBOUNCE_MS);
     return () => clearTimeout(timer);
-  }, [q]);
+  }, [q, debouncedQ]);
 
   // Sync the search/filter state to the URL (replace, not push) so that
   // navigating back from Detail restores the same view.
@@ -123,6 +119,14 @@ export function ProjectList() {
   }, [page, debouncedQ, technology, projectType, devProcessPhase]);
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+
+  // Lưới an toàn: mở URL cũ có ?page=3 nhưng kết quả chỉ còn 1 trang thì
+  // quay về trang 1 thay vì hiển thị màn hình trống.
+  useEffect(() => {
+    if (status === "loaded" && page > totalPages) {
+      setPage(1);
+    }
+  }, [status, page, totalPages]);
 
   function handleTechnologyChange(selected: string[]) {
     setTechnology(selected);
